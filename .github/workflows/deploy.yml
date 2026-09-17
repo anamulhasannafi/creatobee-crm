@@ -7,11 +7,21 @@ on:
 
 jobs:
   web-deploy:
-    name: Deploying files
+    name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
     - name: Get latest code
       uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies & Build
+      run: |
+        npm ci
+        npm run build
 
     - name: Sync files to cPanel
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -20,3 +30,4 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: ./
+        local-dir: ./
