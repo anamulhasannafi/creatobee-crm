@@ -1,4 +1,4 @@
-name: Deploy to cPanel
+name: Build and Deploy to cPanel
 
 on:
   push:
@@ -6,11 +6,10 @@ on:
       - main
 
 jobs:
-  web-deploy:
-    name: Build and Deploy
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Get latest code
+    - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Setup Node.js
@@ -18,16 +17,16 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install dependencies & Build
-      run: |
-        npm ci
-        npm run build
+    - name: Install dependencies
+      run: npm install
 
-    - name: Sync files to cPanel
+    - name: Build project
+      run: npm run build
+
+    - name: Sync files to cPanel via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ./
-        local-dir: ./
+        server-dir: /crm/
